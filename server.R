@@ -19,7 +19,8 @@ server <- function(input, output, session) {
     } else {
       lubridate::as_datetime(0)
     }
-  })
+  }) %>% 
+    bindEvent(input$duration)
   
   unique_vis = reactive({
     start_time = start_time()
@@ -72,7 +73,8 @@ server <- function(input, output, session) {
       ) %>% 
       collect() %>% 
       mutate(arrival = lubridate::with_tz(arrival, "America/New_York"))
-  })
+  }) %>% 
+    bindEvent(input$duration)
   
   output$click_count = renderText({
     round(mean(per_vis_stats()$n), 1)
@@ -135,21 +137,22 @@ server <- function(input, output, session) {
       geom_tile(aes(fill = ct)) +
       scale_fill_viridis_c(end = 0.85) +
       scale_y_reverse(
-        expand = c(0,0), 
+        limits = c(24, 0),
+        expand = c(0, 0),
         breaks = (0:12)*2,
-        labels = function(br) { 
+        labels = function(br) {
           b = br %% 12
           ampm = c("AM", "PM")[(br %/% 12) + 1]
-          l = paste0(b, ":00", ampm) 
+          l = paste0(b, ":00", ampm)
           l[b == 0] <- c("Midnight", "Noon", "Midnight")
           l
           }
       ) +
       scale_x_continuous(
         labels = c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"),
-        limits = c(1, 7), 
+        limits = c(0.5, 7.5),
         breaks = 1:7,
-        expand = c(0,0.5)
+        expand = c(0,0)
       ) +
       labs(x = NULL, y = NULL, fill = "Users per typical hour") +
       theme_minimal(base_size = 18) +
