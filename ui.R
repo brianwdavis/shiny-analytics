@@ -27,7 +27,7 @@ vis_duration = value_box(
 ui = page_sidebar(
   window_title = "CRAFT Dashboard Analytics",
   title = layout_columns(
-    tags$img(src = "craftlogo.gif", style = "height: 3rem; vertical-align: top;"),
+    tags$img(src = "craftlogo.gif", style = "width: 3rem; vertical-align: top;"),
     span("CRAFT Dashboard Analytics"),
     # span(input_dark_mode(id = "theme"), style = "padding-left: 50px;"),
     radioGroupButtons(
@@ -37,7 +37,7 @@ ui = page_sidebar(
       selected = 60*60*24*7,
       status = "info"
     ),
-    col_widths = c(1, 4, 7)
+    col_widths = c(1, 3, 8)
   ),
   theme = bs_theme(bootswatch = bootswatch),
   sidebar = sidebar(open = F),

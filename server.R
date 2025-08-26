@@ -35,20 +35,33 @@ server <- function(input, output, session) {
   })
   
   output$vis_count_plot = renderPlotly({
-    unique_vis() %>% 
-      mutate(time = lubridate::floor_date(time, "hours")) %>% 
+    ret = unique_vis() %>% 
+      mutate(time = lubridate::floor_date(time, "days")) %>% 
       group_by(time) %>% 
-      tally() %>% 
-      plot_ly(
-        x = ~time,
-        y = ~n
-      ) %>% 
+      tally() 
+    if (nrow(ret) == 0) { return(NULL) }
+    #browser()
+    b = min(ret$time)
+    e = max(ret$time)
+    ret_fill = tibble(
+      time = lubridate::as_datetime(seq(b, e, by = 60*60*24))
+    )
+    
+    ret = full_join(ret, ret_fill) %>% 
+      mutate(n = replace(n, is.na(n), 0)) %>% 
+      arrange(time)
+    
+    plot_ly(
+      ret,
+      x = ~time,
+      y = ~n
+    ) %>% 
       add_lines(
         fill = 'tozeroy'
       ) %>% 
       plotly::layout(
-        xaxis = list(visible = T, showgrid = F, title = "", fixedrange = T),
-        yaxis = list(visible = F, showgrid = F, title = "", fixedrange = T),
+        xaxis = list(visible = T, showgrid = F, title = ""),
+        yaxis = list(visible = F, showgrid = F, title = ""),
         hovermode = "x",
         margin = list(t = 0, r = 0, l = 0, b = 0),
         font = list(color = "white"),
@@ -146,7 +159,7 @@ server <- function(input, output, session) {
           l = paste0(b, ":00", ampm)
           l[b == 0] <- c("Midnight", "Noon", "Midnight")
           l
-          }
+        }
       ) +
       scale_x_continuous(
         labels = c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"),
@@ -160,6 +173,6 @@ server <- function(input, output, session) {
         legend.position = "top", 
         legend.key.width = unit(1, "in"),
         panel.grid.major.x = element_blank()
-        ) 
+      ) 
   })
 }
