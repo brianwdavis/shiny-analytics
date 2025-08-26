@@ -13,14 +13,14 @@ server <- function(input, output, session) {
   #on.exit(DBI::dbDisconnect(con))
   
   start_time = reactive({
-    d = as.numeric(input$duration)
+    d = as.numeric(input$duration_selector)
     if (d > 0) {
       Sys.time() - d
     } else {
       lubridate::as_datetime(0)
     }
   }) %>% 
-    bindEvent(input$duration)
+    bindEvent(input$duration_selector)
   
   unique_vis = reactive({
     start_time = start_time()
@@ -74,7 +74,7 @@ server <- function(input, output, session) {
       collect() %>% 
       mutate(arrival = lubridate::with_tz(arrival, "America/New_York"))
   }) %>% 
-    bindEvent(input$duration)
+    bindEvent(input$duration_selector)
   
   output$click_count = renderText({
     round(mean(per_vis_stats()$n), 1)
